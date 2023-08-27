@@ -1,48 +1,30 @@
+import Image from "next/image"
 import Link from "next/link"
+import { getServerSession } from "next-auth"
+import { signOut } from "next-auth/react"
 
 import { siteConfig } from "@/config/site"
-import { buttonVariants } from "@/components/ui/button"
-import { Icons } from "@/components/icons"
-import { MainNav } from "@/components/main-nav"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
-export function SiteHeader() {
+import SignInButton from "./sign-in-button"
+import SignOutButton from "./sign-out-button"
+
+// check to see if user is logged in
+export async function SiteHeader() {
+  const session = await getServerSession(authOptions)
+  // if user is logged in, show sign out button
+
   return (
-    <header className="bg-background sticky top-0 z-40 w-full border-b">
-      <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-        <MainNav items={siteConfig.mainNav} />
-        <div className="flex flex-1 items-center justify-end space-x-4">
+    <header className="sticky top-0 z-40 w-full mt-2 border-b bg-background">
+      <div className="container flex items-center h-16 space-x-4 sm:justify-between sm:space-x-0">
+        <Link href="/">
+          <Image src="/logo.png" alt="logo" width={175} height={175} />
+        </Link>
+        <div className="flex items-center justify-end flex-1 space-x-4">
           <nav className="flex items-center space-x-1">
-            <Link
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <div
-                className={buttonVariants({
-                  size: "icon",
-                  variant: "ghost",
-                })}
-              >
-                <Icons.gitHub className="h-5 w-5" />
-                <span className="sr-only">GitHub</span>
-              </div>
-            </Link>
-            <Link
-              href={siteConfig.links.twitter}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <div
-                className={buttonVariants({
-                  size: "icon",
-                  variant: "ghost",
-                })}
-              >
-                <Icons.twitter className="h-5 w-5 fill-current" />
-                <span className="sr-only">Twitter</span>
-              </div>
-            </Link>
+            {session ? <SignOutButton /> : <SignInButton />}
             <ThemeToggle />
           </nav>
         </div>
